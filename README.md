@@ -1,7 +1,7 @@
 Sqlp
 ======
 
-[![Go Report Card](https://goreportcard.com/badge/github.com/valord577/httpc?t=2)](https://goreportcard.com/report/github.com/valord577/httpc)
+[![Go Report Card](https://goreportcard.com/badge/github.com/valord577/sqlp?t=0)](https://goreportcard.com/report/github.com/valord577/sqlp)
 [![Go Reference](https://pkg.go.dev/badge/github.com/valord577/sqlp.svg)](https://pkg.go.dev/github.com/valord577/sqlp)
 ![GitHub](https://img.shields.io/github/license/valord577/sqlp?t=0)
 
