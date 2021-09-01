@@ -6,6 +6,7 @@ import (
 
 // @author valor.
 
+// TxSession provides a set of extensions on database/sql
 type TxSession struct {
 	db *DBSession
 	tx *goSql.Tx
@@ -21,6 +22,7 @@ func (t *TxSession) Exec(id string, args ...interface{}) (goSql.Result, error) {
 }
 */
 
+// ExecSql execute sql at TxSession
 func (t *TxSession) ExecSql(sql string, args ...interface{}) (goSql.Result, error) {
 	stmt, err := t.db.getJitCachedStmt(sql)
 	if err != nil {
@@ -39,6 +41,7 @@ func (t *TxSession) Query(dest interface{}, id string, args ...interface{}) erro
 }
 */
 
+// QuerySql execute query sql at TxSession
 func (t *TxSession) QuerySql(dest interface{}, sql string, args ...interface{}) error {
 	stmt, err := t.db.getJitCachedStmt(sql)
 	if err != nil {
@@ -60,10 +63,12 @@ func (t *TxSession) queryTx(dest interface{}, stmt *fakeStmt, args ...interface{
 	return scanAny(dest, rs)
 }
 
+// Commit commits the transaction.
 func (t *TxSession) Commit() error {
 	return t.tx.Commit()
 }
 
+// Rollback aborts the transaction.
 func (t *TxSession) Rollback() error {
 	return t.tx.Rollback()
 }

@@ -6,6 +6,7 @@ import (
 
 // @author valor.
 
+// Open returns DBSession
 func Open(db *sql.DB) (*DBSession, error) {
 
 	err := db.Ping()

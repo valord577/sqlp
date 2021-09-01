@@ -6,6 +6,7 @@ import (
 
 // @author valor.
 
+// DBSession provides a set of extensions on database/sql
 type DBSession struct {
 	database *goSql.DB
 	//aotCachedStmt map[string]*fakeStmt
@@ -14,31 +15,36 @@ type DBSession struct {
 	disablePreparedStmtAtDBSession bool
 	disablePreparedStmtAtTxSession bool
 
-	// use raw sql,
-	//   more info: http://go-database-sql.org/prepared.html
+	// use raw sql, when disable prepared stmt
 	rawSqlHandler RawSqlHandler
 }
 
+// EnablePrepStmtAtDBSession enable prepared statement at DBSession
 func (s *DBSession) EnablePrepStmtAtDBSession() {
 	s.disablePreparedStmtAtDBSession = false
 }
 
+// DisablePrepStmtAtDBSession disable prepared statement at DBSession
 func (s *DBSession) DisablePrepStmtAtDBSession() {
 	s.disablePreparedStmtAtDBSession = true
 }
 
+// EnablePrepStmtAtTxSession enable prepared statement at TxSession
 func (s *DBSession) EnablePrepStmtAtTxSession() {
 	s.disablePreparedStmtAtTxSession = false
 }
 
+// DisablePrepStmtAtTxSession disable prepared statement at TxSession
 func (s *DBSession) DisablePrepStmtAtTxSession() {
 	s.disablePreparedStmtAtTxSession = true
 }
 
+// UseRawSqlHandler formats prepared statement to raw sql
 func (s *DBSession) UseRawSqlHandler(h RawSqlHandler) {
 	s.rawSqlHandler = h
 }
 
+// BeginTx begin transaction
 func (s *DBSession) BeginTx() (*TxSession, error) {
 	tx, err := s.database.Begin()
 	if err != nil {
@@ -88,6 +94,7 @@ func (s *DBSession) Exec(id string, args ...interface{}) (goSql.Result, error) {
 }
 */
 
+// ExecSql execute sql at DBSession
 func (s *DBSession) ExecSql(sql string, args ...interface{}) (goSql.Result, error) {
 	stmt, err := s.getJitCachedStmt(sql)
 	if err != nil {
@@ -106,6 +113,7 @@ func (s *DBSession) Query(dest interface{}, id string, args ...interface{}) erro
 }
 */
 
+// QuerySql execute query sql at DBSession
 func (s *DBSession) QuerySql(dest interface{}, sql string, args ...interface{}) error {
 	stmt, err := s.getJitCachedStmt(sql)
 	if err != nil {

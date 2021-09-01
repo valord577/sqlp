@@ -11,6 +11,7 @@ import (
 
 const tagName = "sqlp"
 
+// ErrTooManyResults triggered when sql result rows more than one and no more variable to scan
 var ErrTooManyResults = errors.New("expected one result (or nil), but found multiple")
 
 var sqlScannerInterface = reflect.TypeOf((*goSql.Scanner)(nil)).Elem()
