@@ -15,9 +15,8 @@ func Open(db *sql.DB) (*DBSession, error) {
 	}
 
 	return &DBSession{
-		database:      db,
+		database: db,
 		//aotCachedStmt: make(map[string]*fakeStmt),
 		jitCachedStmt: make(map[string]*fakeStmt),
 	}, nil
 }
-

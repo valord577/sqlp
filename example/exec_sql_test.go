@@ -11,7 +11,7 @@ import (
 
 func TestExecSqlAtDB(t *testing.T) {
 	doTest(func(s *sqlp.DBSession) error {
-		
+
 		sql := "insert into `tc` (`name`) values (?);"
 		ret, err := s.ExecSql(sql, "first name")
 		if err != nil {

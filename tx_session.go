@@ -29,7 +29,7 @@ func (t *TxSession) ExecSql(sql string, args ...interface{}) (goSql.Result, erro
 	return stmt.execAtTx(t, args...)
 }
 
-/* 
+/*
 func (t *TxSession) Query(dest interface{}, id string, args ...interface{}) error {
 	stmt, err := t.db.getAotCachedStmt(id)
 	if err != nil {
@@ -56,7 +56,7 @@ func (t *TxSession) queryTx(dest interface{}, stmt *fakeStmt, args ...interface{
 	defer func(rs *goSql.Rows) {
 		_ = rs.Close()
 	}(rs)
-	
+
 	return scanAny(dest, rs)
 }
 
