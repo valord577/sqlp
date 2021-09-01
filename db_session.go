@@ -7,16 +7,36 @@ import (
 // @author valor.
 
 type DBSession struct {
-	database      *goSql.DB
+	database *goSql.DB
 	//aotCachedStmt map[string]*fakeStmt
 	jitCachedStmt map[string]*fakeStmt
 
 	disablePreparedStmtAtDBSession bool
 	disablePreparedStmtAtTxSession bool
 
-	// use raw sql, 
+	// use raw sql,
 	//   more info: http://go-database-sql.org/prepared.html
 	rawSqlHandler RawSqlHandler
+}
+
+func (s *DBSession) EnablePrepStmtAtDBSession() {
+	s.disablePreparedStmtAtDBSession = false
+}
+
+func (s *DBSession) DisablePrepStmtAtDBSession() {
+	s.disablePreparedStmtAtDBSession = true
+}
+
+func (s *DBSession) EnablePrepStmtAtTxSession() {
+	s.disablePreparedStmtAtTxSession = false
+}
+
+func (s *DBSession) DisablePrepStmtAtTxSession() {
+	s.disablePreparedStmtAtTxSession = true
+}
+
+func (s *DBSession) UseRawSqlHandler(h RawSqlHandler) {
+	s.rawSqlHandler = h
 }
 
 func (s *DBSession) BeginTx() (*TxSession, error) {
@@ -76,7 +96,7 @@ func (s *DBSession) ExecSql(sql string, args ...interface{}) (goSql.Result, erro
 	return stmt.execAtDB(s, args...)
 }
 
-/* 
+/*
 func (s *DBSession) Query(dest interface{}, id string, args ...interface{}) error {
 	stmt, err := s.getAotCachedStmt(id)
 	if err != nil {
@@ -103,6 +123,6 @@ func (s *DBSession) query(dest interface{}, stmt *fakeStmt, args ...interface{})
 	defer func(rs *goSql.Rows) {
 		_ = rs.Close()
 	}(rs)
-	
+
 	return scanAny(dest, rs)
 }
