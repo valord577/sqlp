@@ -176,7 +176,11 @@ func scanStruct(v reflect.Value, rows *goSql.Rows, cols []string, length int, fr
 		if tag == "" {
 			continue
 		}
-		fv.Set(mapColToResult[tag].Elem())
+		
+		r, ok := mapColToResult[tag]
+		if ok {
+			fv.Set(r.Elem())
+		}
 	}
 
 	if !fromSlice {
