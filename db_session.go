@@ -100,7 +100,15 @@ func (s *DBSession) ExecSql(sql string, args ...interface{}) (goSql.Result, erro
 	if err != nil {
 		return nil, err
 	}
-	return stmt.execAtDB(s, args...)
+	return stmt.execAtDB(s, false, args...)
+}
+
+// ExecSql execute sql at DBSession without JIT
+func (s *DBSession) ExecSqlDirect(sql string, args ...interface{}) (goSql.Result, error) {
+	stmt := &fakeStmt{
+		stmtStr: sql,
+	}
+	return stmt.execAtDB(s, true, args...)
 }
 
 /*
@@ -119,11 +127,19 @@ func (s *DBSession) QuerySql(dest interface{}, sql string, args ...interface{}) 
 	if err != nil {
 		return err
 	}
-	return s.query(dest, stmt, args...)
+	return s.query(dest, false, stmt, args...)
 }
 
-func (s *DBSession) query(dest interface{}, stmt *fakeStmt, args ...interface{}) error {
-	rs, err := stmt.queryAtDB(s, args...)
+// QuerySql execute query sql at DBSession without JIT
+func (s *DBSession) QuerySqlDirect(dest interface{}, sql string, args ...interface{}) error {
+	stmt := &fakeStmt{
+		stmtStr: sql,
+	}
+	return s.query(dest, true, stmt, args...)
+}
+
+func (s *DBSession) query(dest interface{}, direct bool, stmt *fakeStmt, args ...interface{}) error {
+	rs, err := stmt.queryAtDB(s, direct, args...)
 	if err != nil {
 		return err
 	}
