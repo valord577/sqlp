@@ -1,17 +1,30 @@
-package example
+package main
 
 import (
 	"database/sql"
 	"fmt"
-	"testing"
 
 	"github.com/valord577/sqlp"
 )
 
 // @author valor.
 
-func TestQuerySqlAtDB(t *testing.T) {
-	doTest(func(s *sqlp.DBSession) error {
+/*
+create table `tc`
+(
+    id int auto_increment
+        primary key,
+    name varchar(16) default '' not null
+);
+*/
+
+const (
+	sqlType = ""
+	sqlDsn  = ""
+)
+
+func main() {
+	do(func(s *sqlp.DBSession) error {
 
 		type Tc struct {
 			ID   uint   `sqlp:"id"`
@@ -98,4 +111,24 @@ func TestQuerySqlAtDB(t *testing.T) {
 
 		return nil
 	})
+}
+
+func do(f func(s *sqlp.DBSession) error) {
+	db, err := sql.Open(sqlType, sqlDsn)
+	if err != nil {
+		panic(err)
+	}
+	defer func(db *sql.DB) {
+		_ = db.Close()
+	}(db)
+
+	dbSession, err := sqlp.Open(db)
+	if err != nil {
+		panic(err)
+	}
+
+	err = f(dbSession)
+	if err != nil {
+		panic(err)
+	}
 }
