@@ -9,12 +9,9 @@ import (
 // DBSession provides a set of extensions on database/sql
 type DBSession struct {
 	database *goSql.DB
-	//aotCachedStmt map[string]*fakeStmt
-	jitCachedStmt map[string]*fakeStmt
 
 	disablePreparedStmtAtDBSession bool
 	disablePreparedStmtAtTxSession bool
-
 	// use raw sql, when disable prepared stmt
 	rawSqlHandler RawSqlHandler
 }
@@ -57,89 +54,30 @@ func (s *DBSession) BeginTx() (*TxSession, error) {
 	}, nil
 }
 
-/*
-func (s *DBSession) getAotCachedStmt(id string) (*fakeStmt, error) {
-	fStmt, ok := s.aotCachedStmt[id]
-	if ok {
-		return fStmt, nil
-	}
-	return nil, errors.New("not found sql, ID: " + id)
-}
-*/
-
-func (s *DBSession) getJitCachedStmt(sql string) (*fakeStmt, error) {
-	fStmt, ok := s.jitCachedStmt[sql]
-	if !ok {
-		stmt, err := s.database.Prepare(sql)
-		if err != nil {
-			return nil, err
-		}
-
-		fStmt = &fakeStmt{
-			stmtStr: sql,
-			stmtSql: stmt,
-		}
-		s.jitCachedStmt[sql] = fStmt
-	}
-	return fStmt, nil
-}
-
-/*
-func (s *DBSession) Exec(id string, args ...interface{}) (goSql.Result, error) {
-	stmt, err := s.getAotCachedStmt(id)
-	if err != nil {
-		return nil, err
-	}
-	return stmt.execAtDB(s, args...)
-}
-*/
-
 // ExecSql execute sql at DBSession
 func (s *DBSession) ExecSql(sql string, args ...interface{}) (goSql.Result, error) {
-	stmt, err := s.getJitCachedStmt(sql)
-	if err != nil {
-		return nil, err
-	}
-	return stmt.execAtDB(s, false, args...)
+	return s.ExecSqlDirect(sql, args...)
 }
 
 // ExecSql execute sql at DBSession without JIT
 func (s *DBSession) ExecSqlDirect(sql string, args ...interface{}) (goSql.Result, error) {
-	stmt := &fakeStmt{
-		stmtStr: sql,
-	}
-	return stmt.execAtDB(s, true, args...)
+	stmt := fakeStmt(sql)
+	return stmt.execAtDB(s, args...)
 }
-
-/*
-func (s *DBSession) Query(dest interface{}, id string, args ...interface{}) error {
-	stmt, err := s.getAotCachedStmt(id)
-	if err != nil {
-		return err
-	}
-	return s.query(dest, stmt, args...)
-}
-*/
 
 // QuerySql execute query sql at DBSession
 func (s *DBSession) QuerySql(dest interface{}, sql string, args ...interface{}) error {
-	stmt, err := s.getJitCachedStmt(sql)
-	if err != nil {
-		return err
-	}
-	return s.query(dest, false, stmt, args...)
+	return s.QuerySqlDirect(dest, sql, args...)
 }
 
 // QuerySql execute query sql at DBSession without JIT
 func (s *DBSession) QuerySqlDirect(dest interface{}, sql string, args ...interface{}) error {
-	stmt := &fakeStmt{
-		stmtStr: sql,
-	}
-	return s.query(dest, true, stmt, args...)
+	stmt := fakeStmt(sql)
+	return s.query(dest, stmt, args...)
 }
 
-func (s *DBSession) query(dest interface{}, direct bool, stmt *fakeStmt, args ...interface{}) error {
-	rs, err := stmt.queryAtDB(s, direct, args...)
+func (s *DBSession) query(dest interface{}, stmt fakeStmt, args ...interface{}) error {
+	rs, err := stmt.queryAtDB(s, args...)
 	if err != nil {
 		return err
 	}

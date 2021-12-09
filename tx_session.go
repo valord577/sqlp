@@ -12,63 +12,30 @@ type TxSession struct {
 	tx *goSql.Tx
 }
 
-/*
-func (t *TxSession) Exec(id string, args ...interface{}) (goSql.Result, error) {
-	stmt, err := t.db.getAotCachedStmt(id)
-	if err != nil {
-		return nil, err
-	}
-	return stmt.execAtTx(t, args...)
-}
-*/
-
 // ExecSql execute sql at TxSession
 func (t *TxSession) ExecSql(sql string, args ...interface{}) (goSql.Result, error) {
-	stmt, err := t.db.getJitCachedStmt(sql)
-	if err != nil {
-		return nil, err
-	}
-	return stmt.execAtTx(t, false, args...)
+	return t.ExecSqlDirect(sql, args...)
 }
 
 // ExecSql execute sql at TxSession without JIT
 func (t *TxSession) ExecSqlDirect(sql string, args ...interface{}) (goSql.Result, error) {
-	stmt := &fakeStmt{
-		stmtStr: sql,
-	}
-	return stmt.execAtTx(t, true, args...)
+	stmt := fakeStmt(sql)
+	return stmt.execAtTx(t, args...)
 }
-
-/*
-func (t *TxSession) Query(dest interface{}, id string, args ...interface{}) error {
-	stmt, err := t.db.getAotCachedStmt(id)
-	if err != nil {
-		return err
-	}
-	return t.queryTx(dest, stmt, args...)
-}
-*/
 
 // QuerySql execute query sql at TxSession
 func (t *TxSession) QuerySql(dest interface{}, sql string, args ...interface{}) error {
-	stmt, err := t.db.getJitCachedStmt(sql)
-	if err != nil {
-		return err
-	}
-	return t.queryTx(dest, false, stmt, args...)
+	return t.QuerySqlDirect(dest, sql, args...)
 }
 
 // QuerySql execute query sql at TxSession without JIT
 func (t *TxSession) QuerySqlDirect(dest interface{}, sql string, args ...interface{}) error {
-	stmt, err := t.db.getJitCachedStmt(sql)
-	if err != nil {
-		return err
-	}
-	return t.queryTx(dest, true, stmt, args...)
+	stmt := fakeStmt(sql)
+	return t.queryTx(dest, stmt, args...)
 }
 
-func (t *TxSession) queryTx(dest interface{}, direct bool, stmt *fakeStmt, args ...interface{}) error {
-	rs, err := stmt.queryAtTx(t, direct, args...)
+func (t *TxSession) queryTx(dest interface{}, stmt fakeStmt, args ...interface{}) error {
+	rs, err := stmt.queryAtTx(t, args...)
 	if err != nil {
 		return err
 	}
