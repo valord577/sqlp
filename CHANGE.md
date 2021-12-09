@@ -2,6 +2,12 @@
 
 All notable changes to **sqlp** are documented in this file.
 
+## v0.3.2021209
+
+#### Changed
+
+- Remove sql statement JIT cache.
+
 ## v0.2.20210914
 
 #### Added
